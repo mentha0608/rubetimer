@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rubetimer v2</title>
+  <title>Rubetimer v2.2</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -146,9 +146,9 @@
         <section class="note-block">
             <h2 class="note-title">使い方</h2>
             <div class="note-content">
-            <p>・ボタンは吹き出しが出ている途中に押す想定です。</p>
-            <p>・7～9秒前に吹き出しが出るため、7秒後の爆発を目安に使ってください。</p>
-            <p>・「1」「2」ボタンは途中合わせ用です。</p>
+            <p>・ボタンは吹き出しが出た瞬間に押す想定です。</p>
+            <p>・ルベランギスの腕が１周したのを目安に押す程度です。。</p>
+            <p>・少し遅れたと思った場合、押すのは「-0.5」です。「1」「2」ボタンは途中合わせ用です。</p>
             <p>・設定から事前読み上げ秒数を 7秒 / 10秒 で選べます。</p>
             <p>・次案内が不要な場合は、設定から再生をOFFにできます。</p>
             </div>
@@ -157,10 +157,16 @@
         <section class="note-block">
             <h2 class="note-title">更新履歴</h2>
             <div class="note-content">
+            <p><strong>v2.20</strong> - タイマー基準を爆発基準から床出現基準へ変更</p>
+            <p>　　　- サークル / グランドのLap値を実測ベースで更新</p>
+            <p>　　　- 初回床までの初期値を調整（サークル 5.7秒 / グランド 6.8秒）</p>
+            <p>　　　- 次案内のタイミングを見直し</p>
+
             <p><strong>v2.11</strong> - 設定UIを調整</p>
             <p>　　　- 事前読み上げ秒数を選択式に変更</p>
             <p>　　　- 次案内の再生ON/OFF設定を追加</p>
-            <p>　　　- 音量表示を設定値連動に修正</p>    
+            <p>　　　- 音量表示を設定値連動に修正</p>
+
             <p><strong>v2.10</strong> - ボタンを押すタイミングを「吹き出しの出ている間」変更</p>
             <p><strong>v2.02</strong> - 「中央大・線上と外」が読まれるように修正</p>
             <p><strong>v2.01</strong> - ループが正常に作用していないバグをFIX</p>
@@ -178,7 +184,7 @@
          フッター
     ======================================== -->
     <div class="footer-note">
-      Rubetimer v2.11｜Persistent Settings Mode<br>
+      Rubetimer v2.20｜Persistent Settings Mode<br>
     </div>
 
   </main>

@@ -1,11 +1,13 @@
 // Rubetimer
-// Version: v2.11
+// Version: v2.20
+// Build: 2026-03-25
 // Author: mentha0608
 // Voice: VOICEVOX:四国めたん
-// Build: 2026-03-24
-// 高精度タイマー方式（performance.now + requestAnimationFrame）
-// タイムラップは実測値を0.25sに丸めて利用
-
+//
+// タイマー仕様：
+// ・高精度タイマー（performance.now + requestAnimationFrame）
+// ・ラップ時間は0.25秒単位で丸めて利用
+// ・床出現タイミング基準で案内
 
 (() => {
   'use strict';
@@ -21,7 +23,7 @@
 
   const CONFIG = {
     defaultLeadSeconds: 7,
-    nextAnnounceDelayMs: 1000,
+    nextAnnounceDelayMs: 6500,
     adjustStepMs: 500,
     displayPrecisionMs: 100,
   };
@@ -113,8 +115,8 @@
   circle: {
     key: 'circle',
     label: 'サークル',
-    initialDelayMs: 7000,
-    loopLapMs: [25500, 18750, 25500, 18750, 27250, 18750],
+    initialDelayMs: 5750,
+    loopLapMs: [23750, 20750, 23250, 21000, 25000, 20750],
     phases: [
       {
         currentText: '線上・大外',
@@ -164,8 +166,9 @@
   grand: {
     key: 'grand',
     label: 'グランド',
-    initialDelayMs: 7000,
-    loopLapMs: [22750, 23750, 23000, 24250, 22250, 24000, 22750, 22750, 24000, 22750, 24250, 24250],
+    initialDelayMs: 6750,
+    loopLapMs: [22000, 24500, 22250, 24000, 22750, 23500,
+                23250, 23500, 23250, 23000, 23750, 22500],
     phases: [
       {
         currentText: '虹床',
