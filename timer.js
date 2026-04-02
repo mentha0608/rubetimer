@@ -1,6 +1,6 @@
 // Rubetimer
-// Version: v2.20
-// Build: 2026-03-25
+// Version: v2.21
+// Build: 2026-04-02
 // Author: mentha0608
 // Voice: VOICEVOX:四国めたん
 //
@@ -91,6 +91,11 @@
         text: '網と線上、大外です',
         kana: 'あみとせんじょう、おおそとです',
         file: 'g_amisen_osoto',
+    },
+    g_amisen_soto: {
+        text: '網と線上、外です',
+        kana: 'あみとせんじょう、そとです',
+        file: 'g_amisen_soto',
     },
     g_center_amisen: {
         text: '中央、網と線上です',
@@ -655,12 +660,6 @@ function playSeTestSound() {
     const savedVoiceVolume = localStorage.getItem(STORAGE_KEYS.voiceVolume);
     const savedAnnounceLead = localStorage.getItem(STORAGE_KEYS.announceLead);
     const savedPlayNextVoice = localStorage.getItem(STORAGE_KEYS.playNextVoice);
-
-    document.querySelectorAll('input[name="voiceMode"]').forEach((el) => {
-      el.addEventListener('change', () => {
-        saveSettings();
-      });
-    });
 
     if (savedVoiceMode) {
       const radio = document.querySelector(`input[name="voiceMode"][value="${savedVoiceMode}"]`);
@@ -1227,6 +1226,14 @@ function playSeTestSound() {
       saveSettings();
     });
 
+    document.querySelectorAll('input[name="voiceMode"]').forEach((el) => {
+      el.addEventListener('change', () => {
+        saveSettings();
+      });
+    });
+
+
+
     window.addEventListener('keydown', (event) => {
       if (event.repeat) return;
 
@@ -1298,7 +1305,8 @@ function playSeTestSound() {
       voiceMode: getVoiceMode(),
       seVolume: dom.seVolume?.value,
       voiceVolume: dom.voiceVolume?.value,
-      announceLead: dom.announceLead?.value,
+      announceLead: document.querySelector('input[name="announceLead"]:checked')?.value,
+      playNextVoice: document.querySelector('input[name="playNextVoice"]:checked')?.value,
     });
   }
 
