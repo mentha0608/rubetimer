@@ -324,6 +324,9 @@
   let activeAudio = null;
   let activeSeAudio = null;
   let activeSequenceToken = 0;
+  let audioUnlocked = false;
+  let audioUnlocking = false;
+  const audioCache = new Map();
 
   function buildKana(parts = []) {
     return parts
@@ -374,6 +377,77 @@
 
   function seekVoiceVolume() {
     return audioConfig.voiceVolume;
+  }
+
+
+  function createAudio(src) {
+    const audio = new Audio(src);
+    audio.preload = 'auto';
+    audio.playsInline = true;
+    audio.setAttribute?.('playsinline', '');
+    audio.setAttribute?.('webkit-playsinline', '');
+    return audio;
+  }
+
+  function getCachedAudio(src) {
+    if (!audioCache.has(src)) {
+      audioCache.set(src, createAudio(src));
+    }
+    return audioCache.get(src);
+  }
+
+  function collectVoiceSources() {
+    return [
+      'audio/timeSignal.mp3',
+      'audio/setvoice.wav',
+    ];
+  }
+
+  async function unlockAudio() {
+    if (audioUnlocked || audioUnlocking) return;
+
+    audioUnlocking = true;
+    const sources = collectVoiceSources();
+
+    try {
+      await Promise.all(
+        sources.map(async (src) => {
+          const audio = getCachedAudio(src);
+
+          const prevMuted = audio.muted;
+          const prevVolume = audio.volume;
+
+          audio.muted = true;
+          audio.volume = 0;
+
+          try {
+            await audio.play();
+          } catch (err) {
+            console.warn('[unlockAudio] play failed', src, err);
+          }
+
+          try {
+            audio.pause();
+          } catch (err) {
+            console.warn('[unlockAudio] pause failed', src, err);
+          }
+
+          try {
+            audio.currentTime = 0;
+          } catch (err) {
+            console.warn('[unlockAudio] rewind failed', src, err);
+          }
+
+          audio.muted = prevMuted;
+          audio.volume = prevVolume;
+        })
+      );
+
+      audioUnlocked = true;
+      console.log('[unlockAudio] complete');
+    } finally {
+      audioUnlocking = false;
+    }
   }
 
   function stopSpeech() {
@@ -495,58 +569,82 @@
 
   function playSingleAudio(src) {
     return new Promise((resolve) => {
-        const audio = new Audio(src);
-        activeAudio = audio;
+      const audio = getCachedAudio(src);
+      activeAudio = audio;
 
-        audio.volume = seekVoiceVolume();
+      try {
+        audio.pause();
+      } catch (e) {
+        console.warn('[playSingleAudio] pause failed', src, e);
+      }
 
-        audio.onended = () => {
+      try {
+        audio.currentTime = 0;
+      } catch (e) {
+        console.warn('[playSingleAudio] rewind failed', src, e);
+      }
+
+      audio.muted = false;
+      audio.volume = seekVoiceVolume();
+
+      audio.onended = () => {
         resolve();
-        };
+      };
 
-        audio.onerror = (event) => {
+      audio.onerror = (event) => {
         console.warn('[audio error]', src, event);
         resolve();
-        };
+      };
 
-        audio.play()
+      audio.play()
         .then(() => {
-            console.log('[audio play]', src);
+          console.log('[audio play]', src);
         })
         .catch((err) => {
-            console.warn('[audio play failed]', src, err);
-            resolve();
+          console.warn('[audio play failed]', src, err);
+          resolve();
         });
     });
-    }
+  }
 
-    async function playAudioSequence(fileList = []) {
-    const token = ++activeSequenceToken;
-    console.log('[play sequence start]', fileList);
+  function playAudioSequence(files = []) {
+    if (!Array.isArray(files) || files.length === 0) return;
 
-    for (const src of fileList) {
-        if (token !== activeSequenceToken) {
-        console.log('[play sequence cancelled]', src);
-        return;
+    stopAudioPlayback();
+
+    const sequenceToken = ++activeSequenceToken;
+
+    (async () => {
+      for (const src of files) {
+        if (sequenceToken !== activeSequenceToken) {
+          return;
         }
 
         await playSingleAudio(src);
-    }
 
-    if (token === activeSequenceToken) {
+        if (sequenceToken !== activeSequenceToken) {
+          return;
+        }
+      }
+
+      if (sequenceToken === activeSequenceToken) {
         activeAudio = null;
-        console.log('[play sequence end]');
-    }
+      }
+    })().catch((err) => {
+      console.warn('[playAudioSequence] failed', err);
+    });
   }
 
   const se = {
-    timeSignal: new Audio('audio/timeSignal.mp3'),
+    timeSignal: getCachedAudio('audio/timeSignal.mp3'),
   };
 
   function playTimeSignal() {
     try {
       activeSeAudio = se.timeSignal;
+      activeSeAudio.pause();
       activeSeAudio.currentTime = 0;
+      activeSeAudio.muted = false;
       activeSeAudio.volume = audioConfig.seVolume;
       activeSeAudio.play();
     } catch (e) {
@@ -558,8 +656,10 @@
     try {
       stopAudioPlayback();
 
-      activeAudio = new Audio('audio/setvoice.wav');
+      activeAudio = getCachedAudio('audio/setvoice.wav');
+      activeAudio.pause();
       activeAudio.currentTime = 0;
+      activeAudio.muted = false;
       activeAudio.volume = audioConfig.voiceVolume;
       activeAudio.play();
     } catch (e) {
@@ -567,18 +667,20 @@
     }
   }
 
-function playSeTestSound() {
-  try {
-    stopSePlayback();
+  function playSeTestSound() {
+    try {
+      stopSePlayback();
 
-    activeSeAudio = new Audio('audio/timeSignal.mp3');
-    activeSeAudio.currentTime = 0;
-    activeSeAudio.volume = audioConfig.seVolume;
-    activeSeAudio.play();
-  } catch (e) {
-    console.warn('[playSeTestSound] error', e);
+      activeSeAudio = getCachedAudio('audio/timeSignal.mp3');
+      activeSeAudio.pause();
+      activeSeAudio.currentTime = 0;
+      activeSeAudio.muted = false;
+      activeSeAudio.volume = audioConfig.seVolume;
+      activeSeAudio.play();
+    } catch (e) {
+      console.warn('[playSeTestSound] error', e);
+    }
   }
-}
 
   const voice = {
     lead(arg1, arg2 = '') {
@@ -1158,126 +1260,166 @@ function playSeTestSound() {
    - saveSettings: 設定記憶
 ======================================== */
 
-  function bindEvents() {
-    dom.btnCircle?.addEventListener('click', () => {
-      updateButtonState('circle');
-      startMode('circle', 0);
+function bindEvents() {
+  dom.btnCircle?.addEventListener('click', async () => {
+    unlockAudio().catch((err) => {
+      console.warn('[unlockAudio] failed', err);
     });
+    updateButtonState('circle');
+    startMode('circle', 0);
+  });
 
-    dom.btnCircle1?.addEventListener('click', () => {
-      updateButtonState('circle1');
-      startMode('circle', 1);
+  dom.btnCircle1?.addEventListener('click', async () => {
+    unlockAudio().catch((err) => {
+      console.warn('[unlockAudio] failed', err);
     });
+    updateButtonState('circle1');
+    startMode('circle', 1);
+  });
 
-    dom.btnCircle2?.addEventListener('click', () => {
-      updateButtonState('circle2');
-      startMode('circle', 2);
+  dom.btnCircle2?.addEventListener('click', async () => {
+    unlockAudio().catch((err) => {
+      console.warn('[unlockAudio] failed', err);
     });
+    updateButtonState('circle2');
+    startMode('circle', 2);
+  });
 
-    dom.btnGrand?.addEventListener('click', () => {
-      updateButtonState('grand');
-      startMode('grand', 0);
+  dom.btnGrand?.addEventListener('click', async () => {
+    unlockAudio().catch((err) => {
+      console.warn('[unlockAudio] failed', err);
     });
+    updateButtonState('grand');
+    startMode('grand', 0);
+  });
 
-    dom.btnGrand1?.addEventListener('click', () => {
-      updateButtonState('grand1');
-      startMode('grand', 1);
+  dom.btnGrand1?.addEventListener('click', async () => {
+    unlockAudio().catch((err) => {
+      console.warn('[unlockAudio] failed', err);
     });
+    updateButtonState('grand1');
+    startMode('grand', 1);
+  });
 
-    dom.btnGrand2?.addEventListener('click', () => {
-      updateButtonState('grand2');
-      startMode('grand', 2);
+  dom.btnGrand2?.addEventListener('click', async () => {
+    unlockAudio().catch((err) => {
+      console.warn('[unlockAudio] failed', err);
     });
+    updateButtonState('grand2');
+    startMode('grand', 2);
+  });
 
-    dom.btnAdjustPlus?.addEventListener('click', () => {
-      adjustTargetTime(CONFIG.adjustStepMs);
+  dom.btnAdjustPlus?.addEventListener('click', async () => {
+    unlockAudio().catch((err) => {
+      console.warn('[unlockAudio] failed', err);
     });
+    adjustTargetTime(CONFIG.adjustStepMs);
+  });
 
-    dom.btnAdjustMinus?.addEventListener('click', () => {
-      adjustTargetTime(-CONFIG.adjustStepMs);
+  dom.btnAdjustMinus?.addEventListener('click', async () => {
+    unlockAudio().catch((err) => {
+      console.warn('[unlockAudio] failed', err);
     });
+    adjustTargetTime(-CONFIG.adjustStepMs);
+  });
 
-    dom.btnReset?.addEventListener('click', () => {
-      updateButtonState('initial');
-      resetTimer();
+  dom.btnReset?.addEventListener('click', async () => {
+    unlockAudio().catch((err) => {
+      console.warn('[unlockAudio] failed', err);
     });
+    updateButtonState('initial');
+    resetTimer();
+  });
 
-    document.querySelectorAll('input[name="announceLead"]').forEach((el) => {
-      el.addEventListener('change', () => {
-        saveSettings();
-      });
+  document.querySelectorAll('input[name="announceLead"]').forEach((el) => {
+    el.addEventListener('change', async () => {
+      unlockAudio().catch((err) => {
+      console.warn('[unlockAudio] failed', err);
     });
-
-    document.querySelectorAll('input[name="playNextVoice"]').forEach((el) => {
-      el.addEventListener('change', () => {
-        saveSettings();
-      });
-    });
-
-    dom.seVolume?.addEventListener('input', (e) => {
-      audioConfig.seVolume = e.target.value / 100;
-      playSeTestSound();
       saveSettings();
     });
+  });
 
-    dom.voiceVolume?.addEventListener('input', (e) => {
-      audioConfig.voiceVolume = e.target.value / 100;
-      playVoiceTestSound();
+  document.querySelectorAll('input[name="playNextVoice"]').forEach((el) => {
+    el.addEventListener('change', async () => {
+      unlockAudio().catch((err) => {
+      console.warn('[unlockAudio] failed', err);
+    });
       saveSettings();
     });
+  });
 
-    document.querySelectorAll('input[name="voiceMode"]').forEach((el) => {
-      el.addEventListener('change', () => {
-        saveSettings();
-      });
+  dom.seVolume?.addEventListener('input', async (e) => {
+    unlockAudio().catch((err) => {
+      console.warn('[unlockAudio] failed', err);
     });
+    audioConfig.seVolume = e.target.value / 100;
+    playSeTestSound();
+    saveSettings();
+  });
 
-
-
-    window.addEventListener('keydown', (event) => {
-      if (event.repeat) return;
-
-      switch (event.key) {
-        case 'F1':
-          updateButtonState('circle');
-          startMode('circle', 0);
-          break;
-        case 'F2':
-          updateButtonState('circle1');
-          startMode('circle', 1);
-          break;
-        case 'F3':
-          updateButtonState('circle2');
-          startMode('circle', 2);
-          break;
-        case 'F5':
-          updateButtonState('grand');
-          startMode('grand', 0);
-          break;
-        case 'F6':
-          updateButtonState('grand1');
-          startMode('grand', 1);
-          break;
-        case 'F7':
-          updateButtonState('grand2');
-          startMode('grand', 2);
-          break;
-        case '+':
-        case '=':
-          adjustTargetTime(CONFIG.adjustStepMs);
-          break;
-        case '-':
-          adjustTargetTime(-CONFIG.adjustStepMs);
-          break;
-        case 'Delete':
-          updateButtonState('initial');
-          resetTimer();
-          break;
-        default:
-          break;
-      }
+  dom.voiceVolume?.addEventListener('input', async (e) => {
+    unlockAudio().catch((err) => {
+      console.warn('[unlockAudio] failed', err);
     });
-  }
+    audioConfig.voiceVolume = e.target.value / 100;
+    playVoiceTestSound();
+    saveSettings();
+  });
+
+  document.querySelectorAll('input[name="voiceMode"]').forEach((el) => {
+    el.addEventListener('change', async () => {
+      unlockAudio().catch((err) => {
+      console.warn('[unlockAudio] failed', err);
+    });
+      saveSettings();
+    });
+  });
+
+  window.addEventListener('keydown', (event) => {
+    if (event.repeat) return;
+
+    switch (event.key) {
+      case 'F1':
+        updateButtonState('circle');
+        startMode('circle', 0);
+        break;
+      case 'F2':
+        updateButtonState('circle1');
+        startMode('circle', 1);
+        break;
+      case 'F3':
+        updateButtonState('circle2');
+        startMode('circle', 2);
+        break;
+      case 'F5':
+        updateButtonState('grand');
+        startMode('grand', 0);
+        break;
+      case 'F6':
+        updateButtonState('grand1');
+        startMode('grand', 1);
+        break;
+      case 'F7':
+        updateButtonState('grand2');
+        startMode('grand', 2);
+        break;
+      case '+':
+      case '=':
+        adjustTargetTime(CONFIG.adjustStepMs);
+        break;
+      case '-':
+        adjustTargetTime(-CONFIG.adjustStepMs);
+        break;
+      case 'Delete':
+        updateButtonState('initial');
+        resetTimer();
+        break;
+      default:
+        break;
+    }
+  });
+}
 
   /* ========================================
      9. 初期化
@@ -1300,6 +1442,10 @@ function playSeTestSound() {
       dom.seVolume,
       document.getElementById('seVolumeValue')
     );
+
+    collectVoiceSources().forEach((src) => {
+      getCachedAudio(src);
+    });
 
     console.log('[init] complete', {
       voiceMode: getVoiceMode(),
