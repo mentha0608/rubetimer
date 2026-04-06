@@ -396,6 +396,18 @@
     return audioCache.get(src);
   }
 
+  function createPlaybackAudio(src) {
+    const base = getCachedAudio(src);
+    const audio = base.cloneNode(true);
+
+    audio.preload = 'auto';
+    audio.playsInline = true;
+    audio.setAttribute?.('playsinline', '');
+    audio.setAttribute?.('webkit-playsinline', '');
+
+    return audio;
+  }
+
   function collectVoiceSources() {
     return [
       'audio/timeSignal.mp3',
@@ -457,21 +469,21 @@
   }
 
   function stopAudioPlayback() {
+    activeSequenceToken++;
     console.log('[stopAudioPlayback] called');
 
-    // 再生中のシーケンスを無効化
-    activeSequenceToken += 1;
-
-    // 再生中の音声を止める
     if (activeAudio) {
-        try {
-          activeAudio.pause();
-          activeAudio.currentTime = 0;
-        } catch (e) {
-          console.warn('[stopAudioPlayback] error while stopping audio', e);
-        }
+      try {
+        activeAudio.onended = null;
+        activeAudio.onerror = null;
+        activeAudio.onpause = null;
+        activeAudio.pause();
+        activeAudio.currentTime = 0;
+      } catch (e) {
+        console.warn('[stopAudioPlayback] error', e);
+      }
 
-        activeAudio = null;
+      activeAudio = null;
     }
   }
 
@@ -569,31 +581,36 @@
 
   function playSingleAudio(src) {
     return new Promise((resolve) => {
-      const audio = getCachedAudio(src);
+      const audio = createPlaybackAudio(src);
       activeAudio = audio;
 
-      try {
-        audio.pause();
-      } catch (e) {
-        console.warn('[playSingleAudio] pause failed', src, e);
-      }
+      let resolved = false;
+      const done = () => {
+        if (resolved) return;
+        resolved = true;
 
-      try {
-        audio.currentTime = 0;
-      } catch (e) {
-        console.warn('[playSingleAudio] rewind failed', src, e);
-      }
+        audio.onended = null;
+        audio.onerror = null;
+        audio.onpause = null;
 
-      audio.muted = false;
+        if (activeAudio === audio) {
+          activeAudio = null;
+        }
+
+        resolve();
+      };
+
       audio.volume = seekVoiceVolume();
+      audio.muted = false;
 
       audio.onended = () => {
-        resolve();
+        console.log('[audio ended]', src);
+        done();
       };
 
       audio.onerror = (event) => {
         console.warn('[audio error]', src, event);
-        resolve();
+        done();
       };
 
       audio.play()
@@ -602,36 +619,43 @@
         })
         .catch((err) => {
           console.warn('[audio play failed]', src, err);
-          resolve();
+          done();
         });
     });
   }
 
-  function playAudioSequence(files = []) {
-    if (!Array.isArray(files) || files.length === 0) return;
+  function playAudioSequence(fileList = []) {
+    if (!Array.isArray(fileList) || fileList.length === 0) return;
 
     stopAudioPlayback();
 
-    const sequenceToken = ++activeSequenceToken;
+    const token = ++activeSequenceToken;
+    console.log('[play sequence start]', fileList, { token });
 
     (async () => {
-      for (const src of files) {
-        if (sequenceToken !== activeSequenceToken) {
+      for (const src of fileList) {
+        if (token !== activeSequenceToken) {
+          console.log('[play sequence cancelled before]', src, { token, activeSequenceToken });
           return;
         }
 
         await playSingleAudio(src);
 
-        if (sequenceToken !== activeSequenceToken) {
+        if (token !== activeSequenceToken) {
+          console.log('[play sequence cancelled after]', src, { token, activeSequenceToken });
           return;
         }
+
+        // Safari向けのワンクッション
+        await new Promise((r) => setTimeout(r, 60));
       }
 
-      if (sequenceToken === activeSequenceToken) {
+      if (token === activeSequenceToken) {
         activeAudio = null;
+        console.log('[play sequence end]', { token });
       }
     })().catch((err) => {
-      console.warn('[playAudioSequence] failed', err);
+      console.warn('[play sequence failed]', err);
     });
   }
 
