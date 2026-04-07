@@ -1,5 +1,5 @@
 // Rubetimer
-// Version: v2.21
+// Version: v2.22beta
 // Build: 2026-04-02
 // Author: mentha0608
 // Voice: VOICEVOX:四国めたん
@@ -8,6 +8,7 @@
 // ・高精度タイマー（performance.now + requestAnimationFrame）
 // ・ラップ時間は0.25秒単位で丸めて利用
 // ・床出現タイミング基準で案内
+// ・beta版ではSafari対応テスト中
 
 (() => {
   'use strict';
@@ -394,6 +395,47 @@
       audioCache.set(src, createAudio(src));
     }
     return audioCache.get(src);
+  }
+
+  function collectModeVoiceParts(modeKey) {
+    const mode = getModeConfig(modeKey);
+    if (!mode || !Array.isArray(mode.phases)) return [];
+
+    const partKeys = new Set();
+
+    mode.phases.forEach((phase) => {
+      if (Array.isArray(phase?.leadParts)) {
+        phase.leadParts.forEach((key) => partKeys.add(key));
+      }
+
+      if (Array.isArray(phase?.nextParts)) {
+        phase.nextParts.forEach((key) => partKeys.add(key));
+      }
+    });
+
+    return [...partKeys];
+  }
+
+  function collectModeVoiceSources(modeKey) {
+    return collectModeVoiceParts(modeKey)
+      .map((key) => VOICE_PARTS[key]?.file)
+      .filter(Boolean)
+      .map((file) => `audio/${file}.wav`);
+  }
+
+  function preloadModeVoices(modeKey) {
+    const sources = collectModeVoiceSources(modeKey);
+
+    sources.forEach((src) => {
+      const audio = getCachedAudio(src);
+      try {
+        audio.load();
+      } catch (err) {
+        console.warn('[preloadModeVoices] load failed', src, err);
+      }
+    });
+
+    console.log('[preloadModeVoices]', modeKey, sources);
   }
 
   function createPlaybackAudio(src) {
@@ -1124,6 +1166,8 @@
   function startMode(modeKey, scrambleState = 0) {
     const mode = getModeConfig(modeKey);
     if (!mode) return;
+
+    preloadModeVoices(modeKey);
 
     clearNextAnnounceTimeout();
     clearTimerLoop();
