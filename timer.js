@@ -1,5 +1,5 @@
 // Rubetimer
-// Version: v2.30
+// Version: v2.31
 // Build: 2026-04-08
 // Author: mentha0608
 // Voice: VOICEVOX:四国めたん
@@ -9,6 +9,7 @@
 // ・ラップ時間は0.25秒単位で丸めて利用
 // ・床出現タイミング基準で案内
 // ・Howler.js による音声再生基盤へ移行
+// ・外部割当キー（[ ] + -）による操作へ整理
 
 (() => {
   'use strict';
@@ -866,7 +867,7 @@
    - updateButtonState: ボタン描画
    - BUTTON_STATE_TABLE: ボタンの考え方反映
    - adjustTargetTime 系
-======================================== */
+  ======================================== */
 
   function updateButtonState(stateKey) {
     const table = BUTTON_STATE_TABLE[stateKey];
@@ -1193,7 +1194,7 @@
    - 開始ボタンイベント
    - 調整ボタンイベント
    - 設定変更イベント
-   - キーボードイベント
+   - キーボード / 外部割当キーイベント
 ======================================== */
 
   function bindEvents() {
@@ -1296,41 +1297,30 @@
       if (event.repeat) return;
 
       switch (event.key) {
-        case 'F1':
+        // 新キー
+        case '[':
           updateButtonState('circle');
           startMode('circle', 0);
           break;
-        case 'F2':
-          updateButtonState('circle1');
-          startMode('circle', 1);
-          break;
-        case 'F3':
-          updateButtonState('circle2');
-          startMode('circle', 2);
-          break;
-        case 'F5':
+        case ']':
           updateButtonState('grand');
           startMode('grand', 0);
           break;
-        case 'F6':
-          updateButtonState('grand1');
-          startMode('grand', 1);
-          break;
-        case 'F7':
-          updateButtonState('grand2');
-          startMode('grand', 2);
-          break;
+
         case '+':
         case '=':
           adjustTargetTime(CONFIG.adjustStepMs);
           break;
+
         case '-':
           adjustTargetTime(-CONFIG.adjustStepMs);
           break;
+
         case 'Delete':
           updateButtonState('initial');
           resetTimer();
           break;
+
         default:
           break;
       }
