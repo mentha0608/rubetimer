@@ -1,6 +1,5 @@
-// Rubetimer
-// Version: v2.31
-// Build: 2026-04-08
+// Version: v2.32
+// Build: 2026-04-21
 // Author: mentha0608
 // Voice: VOICEVOX:四国めたん
 //
@@ -36,6 +35,7 @@
     voiceVolume: 'rubetimer.voiceVolume',
     announceLead: 'rubetimer.announceLead',
     playNextVoice: 'rubetimer.playNextVoice',
+    metronomeInterval: 'rubetimer.metronomeInterval',
   };
 
   const audioConfig = {
@@ -60,6 +60,11 @@
         kana: 'おそい',
         file: 's_osoi',
     },
+    s_5sec: {
+        text: '5秒前',
+        kana: 'ごびょうまえ',
+        file: 's_5sec',
+    },
 
     // ===== サークル =====
     c_senjo_osoto: {
@@ -81,6 +86,28 @@
         text: '中央大・外です',
         kana: 'ちゅうおう だい、そとです',
         file: 'c_center_large_soto',
+    },
+
+    // ===== サークル（安置案内版）=====
+    c_anchi_senjo_osoto: {
+        text: '線上・大外が安置です',
+        kana: 'せんじょう、おおそとがあんちです',
+        file: 'c_anchi_senjo_osoto',
+    },
+    c_anchi_center_large_senjo: {
+        text: '中央大・線上が安置です',
+        kana: 'ちゅうおう だい、せんじょうがあんちです',
+        file: 'c_anchi_center_large_senjo',
+    },
+    c_anchi_center_ami_soto: {
+        text: '中央・網・外が安置です',
+        kana: 'ちゅうおう、あみ、そとがあんちです',
+        file: 'c_anchi_center_ami_soto',
+    },
+    c_anchi_center_large_soto: {
+        text: '中央大・外が安置です',
+        kana: 'ちゅうおう だい、そとがあんちです',
+        file: 'c_anchi_center_large_soto',
     },
 
     // ===== グランド =====
@@ -126,42 +153,42 @@
     loopLapMs: [23750, 20750, 23250, 21000, 25000, 20750],
     phases: [
       {
-        currentText: '線上・大外',
+        currentText: '➀線上・大外',
         noteText: '-',
 
         leadParts: ['c_senjo_osoto'],
         nextParts: ['s_tsugi', 'c_senjo_osoto', 's_loop'],
       },
       {
-        currentText: '中央大・線上',
+        currentText: '➁中央大・線上',
         noteText: '遅い',
 
         leadParts: ['s_osoi', 'c_center_large_senjo'],
         nextParts: ['s_tsugi', 'c_center_large_senjo'],
       },
       {
-        currentText: '中央・網・外',
+        currentText: '➂中央・網・外',
         noteText: '-',
 
         leadParts: ['c_center_ami_soto'],
         nextParts: ['s_tsugi', 'c_center_ami_soto'],
       },
       {
-        currentText: '線上・大外',
+        currentText: '➃線上・大外',
         noteText: '遅い',
 
         leadParts: ['s_osoi', 'c_senjo_osoto'],
         nextParts: ['s_tsugi', 'c_senjo_osoto'],
       },
       {
-        currentText: '中央大・外',
+        currentText: '➄中央大・外',
         noteText: '-',
 
         leadParts: ['c_center_large_soto'],
         nextParts: ['s_tsugi', 'c_center_large_soto'],
       },
       {
-        currentText: '中央・網・外',
+        currentText: '➅中央・網・外',
         noteText: '遅い',
 
         leadParts: ['s_osoi', 'c_center_ami_soto'],
@@ -178,85 +205,85 @@
                 23250, 23500, 23250, 23000, 23750, 22500],
     phases: [
       {
-        currentText: '虹床',
-        noteText: '-',
+        currentText: '-',
+        noteText: '虹床',
 
         leadParts: ['g_niji'],
         nextParts: ['s_tsugi', 'g_niji', 's_loop'],
       },
       {
-        currentText: '網上・大外',
-        noteText: '外の外（安置）',
+        currentText: '外の外（安置）',
+        noteText: '網上・大外',
 
         leadParts: ['g_amisen_osoto'],
         nextParts: ['s_tsugi', 'g_amisen_osoto'],
       },
       {
-        currentText: '虹床',
-        noteText: '-',
+        currentText: '-',
+        noteText: '虹床',
 
         leadParts: ['g_niji'],
         nextParts: ['s_tsugi', 'g_niji'],
       },
       {
-        currentText: '中央大・外',
-        noteText: '外の外（安置）',
+        currentText: '外の外（安置）',
+        noteText: '中央大・外',
 
         leadParts: ['g_center_large_soto'],
         nextParts: ['s_tsugi', 'g_center_large_soto'],
       },
       {
-        currentText: '虹床',
-        noteText: '-',
+        currentText: '-',
+        noteText: '虹床',
 
         leadParts: ['g_niji'],
         nextParts: ['s_tsugi', 'g_niji'],
       },
       {
-        currentText: '中央、網と線の上',
-        noteText: '大外（安置）',
+        currentText: '大外（ずっと安置）',
+        noteText: '中央、網と線の上',
 
         leadParts: ['g_center_amisen'],
         nextParts: ['s_tsugi', 'g_center_amisen'],
       },
       {
-        currentText: '虹床',
-        noteText: '-',
+        currentText: '-',
+        noteText: '虹床',
 
         leadParts: ['g_niji'],
         nextParts: ['s_tsugi', 'g_niji'],
       },
       {
-        currentText: '網上・大外',
-        noteText: '線上（安置）',
+        currentText: '線上（安置）',
+        noteText: '網上・大外',
 
         leadParts: ['g_amisen_osoto'],
         nextParts: ['s_tsugi', 'g_amisen_osoto'],
       },
       {
-        currentText: '虹床',
-        noteText: '-',
+        currentText: '-',
+        noteText: '虹床',
 
         leadParts: ['g_niji'],
         nextParts: ['s_tsugi', 'g_niji'],
       },
       {
-        currentText: '網上・線上・外',
-        noteText: '網上（安置）',
+        currentText: '網上（安置）',
+        noteText: '網上・線上・外',
 
         leadParts: ['g_amisen_soto'],
         nextParts: ['s_tsugi', 'g_amisen_soto'],
       },
       {
-        currentText: '虹床',
-        noteText: '-',
+        currentText: '-',
+        noteText: '虹床',
 
         leadParts: ['g_niji'],
         nextParts: ['s_tsugi', 'g_niji'],
       },
       {
-        currentText: '中央大・線上と外',
-        noteText: '外（安置）',
+        currentText: '外（安置）',
+        noteText: '中央大・線上と外',
 
         leadParts: ['g_center_senjo_soto'],
         nextParts: ['s_tsugi', 'g_center_senjo_soto'],
@@ -291,6 +318,7 @@
     seVolume: document.getElementById('seVolume'),
     voiceVolume: document.getElementById('voiceVolume'),
     playNextVoiceRadios: document.querySelectorAll('input[name="playNextVoice"]'),
+    metronomeIntervalRadios: document.querySelectorAll('input[name="metronomeInterval"]'),
   };
 
 /* ========================================
@@ -310,6 +338,9 @@
     leadFired: false,
     countdown3Fired: false,
     nextAnnounceTimeoutId: 0,
+
+    lastMetronomeTenths: null,
+    fiveSecondsVoiceFired: false,
   };
 
 /* ========================================
@@ -392,11 +423,19 @@
     // 新形式: phaseオブジェクトを渡した場合
     if (arg1 && typeof arg1 === 'object' && !Array.isArray(arg1)) {
       if (Array.isArray(arg1.leadParts)) {
+        const voiceMode = getVoiceMode();
+
+        if (voiceMode === 'voicevox_anchi') {
+          return buildKana(convertLeadPartsForAnchiMode(arg1));
+        }
+
         return buildKana(arg1.leadParts);
       }
-    // 旧形式の名残がphase内にある場合の保険
+
+      // 旧形式の名残がphase内にある場合の保険
       return [arg1.leadText, arg1.leadExtraText].filter(Boolean).join(' ');
     }
+
     // 旧形式: 文字列2本
     return [arg1, arg2].filter(Boolean).join(' ');
   }
@@ -516,9 +555,35 @@
       .filter(Boolean);
   }
 
+  function convertLeadPartsForAnchiMode(phase) {
+    if (!phase || !Array.isArray(phase.leadParts)) return [];
+
+    return phase.leadParts.map((key) => {
+      switch (key) {
+        case 'c_senjo_osoto':
+          return 'c_anchi_senjo_osoto';
+        case 'c_center_large_senjo':
+          return 'c_anchi_center_large_senjo';
+        case 'c_center_ami_soto':
+          return 'c_anchi_center_ami_soto';
+        case 'c_center_large_soto':
+          return 'c_anchi_center_large_soto';
+        default:
+          return key;
+      }
+    });
+  }
+
   function resolveLeadFiles(arg1) {
     if (arg1 && typeof arg1 === 'object' && !Array.isArray(arg1)) {
       if (Array.isArray(arg1.leadParts)) {
+        const voiceMode = getVoiceMode();
+
+        // VOICEVOX（安置案内）時は、サークル系 lead だけ安置案内版へ差し替え
+        if (voiceMode === 'voicevox_anchi') {
+          return buildAudioFiles(convertLeadPartsForAnchiMode(arg1));
+        }
+
         return buildAudioFiles(arg1.leadParts);
       }
     }
@@ -582,6 +647,9 @@
 
   const se = {
     timeSignal: 'audio/timeSignal.mp3',
+
+    metronomeBeep: 'audio/metronomeBeep.mp3',
+    metronomeChime: 'audio/metronomeChime.mp3',
   };
 
   function playTimeSignal() {
@@ -593,6 +661,30 @@
       sound.volume(audioConfig.seVolume, id);
     } catch (e) {
       console.warn('[playTimeSignal] error', e);
+    }
+  }
+
+  function playMetronomeBeep() {
+  try {
+    const sound = getHowl(se.metronomeBeep, { volume: audioConfig.seVolume * 0.45 });
+    activeSeHowl = sound;
+
+    const id = sound.play();
+    sound.volume(audioConfig.seVolume * 0.45, id);
+  } catch (e) {
+    console.warn('[playMetronomeBeep] error', e);
+  }
+}
+
+  function playMetronomeChime() {
+    try {
+      const sound = getHowl(se.metronomeChime, { volume: audioConfig.seVolume * 0.65 });
+      activeSeHowl = sound;
+
+      const id = sound.play();
+      sound.volume(audioConfig.seVolume * 0.65, id);
+    } catch (e) {
+      console.warn('[playMetronomeChime] error', e);
     }
   }
 
@@ -657,6 +749,20 @@
       console.log('[next files]', files);
       playHowlSequence(files);
     },
+
+    fiveSeconds() {
+      const text = buildKana(['s_5sec']);
+      console.log('[fiveSeconds]', text);
+
+      if (getVoiceMode() === 'simple') {
+        speakKana(text);
+        return;
+      }
+
+      const files = buildAudioFiles(['s_5sec']);
+      console.log('[fiveSeconds files]', files);
+      playHowlSequence(files);
+    },
   };
 
 /* ========================================
@@ -677,9 +783,13 @@
     const playNextVoiceValue =
       document.querySelector('input[name="playNextVoice"]:checked')?.value ?? 'on';
 
+    const metronomeIntervalValue =
+       document.querySelector('input[name="metronomeInterval"]:checked')?.value ?? 'off';
+
     localStorage.setItem(STORAGE_KEYS.voiceMode, voiceMode);
     localStorage.setItem(STORAGE_KEYS.announceLead, announceLeadValue);
     localStorage.setItem(STORAGE_KEYS.playNextVoice, playNextVoiceValue);
+    localStorage.setItem(STORAGE_KEYS.metronomeInterval, metronomeIntervalValue);
 
     if (seVolumeEl) {
       localStorage.setItem(STORAGE_KEYS.seVolume, seVolumeEl.value);
@@ -695,6 +805,7 @@
     voiceVolume: dom.voiceVolume?.value,
     announceLead: announceLeadValue,
     playNextVoice: playNextVoiceValue,
+    metronomeInterval: metronomeIntervalValue,
   });
   }
 
@@ -704,6 +815,7 @@
     const savedVoiceVolume = localStorage.getItem(STORAGE_KEYS.voiceVolume);
     const savedAnnounceLead = localStorage.getItem(STORAGE_KEYS.announceLead);
     const savedPlayNextVoice = localStorage.getItem(STORAGE_KEYS.playNextVoice);
+    const savedMetronomeInterval = localStorage.getItem(STORAGE_KEYS.metronomeInterval);
 
     if (savedVoiceMode) {
       const radio = document.querySelector(`input[name="voiceMode"][value="${savedVoiceMode}"]`);
@@ -736,12 +848,20 @@
       }
     }
 
+    if (savedMetronomeInterval) {
+      const radio = document.querySelector(`input[name="metronomeInterval"][value="${savedMetronomeInterval}"]`);
+      if (radio) {
+        radio.checked = true;
+      }
+    }
+
     console.log('[settings load]', {
       voiceMode: getVoiceMode(),
       seVolume: dom.seVolume?.value,
       voiceVolume: dom.voiceVolume?.value,
       announceLead: document.querySelector('input[name="announceLead"]:checked')?.value,
       playNextVoice: document.querySelector('input[name="playNextVoice"]:checked')?.value,
+      metronomeInterval: document.querySelector('input[name="metronomeInterval"]:checked')?.value,
     });
   }
 
@@ -786,6 +906,18 @@
   function shouldPlayNextVoice() {
     const checked = document.querySelector('input[name="playNextVoice"]:checked');
     return checked?.value !== 'off';
+  }
+
+  function getMetronomeInterval() {
+    const checked = document.querySelector('input[name="metronomeInterval"]:checked');
+    const raw = checked?.value ?? 'off';
+
+    if (raw === 'off') return 0;
+
+    const value = Number(raw);
+    if (Number.isNaN(value) || value <= 0) return 0;
+
+    return value;
   }
 
   function clearNextAnnounceTimeout() {
@@ -847,6 +979,9 @@
   function resetAnnouncementFlags() {
     state.leadFired = false;
     state.countdown3Fired = false;
+
+    state.lastMetronomeTenths = null;
+    state.fiveSecondsVoiceFired = false;
   }
 
   function bindVolumeDisplay(rangeEl, valueEl) {
@@ -860,6 +995,10 @@
 
     // 初期表示
     update();
+  }
+
+  function shouldPlayFiveSecondsVoice() {
+    return getLeadSeconds() === 10;
   }
 
   /* ========================================
@@ -1102,16 +1241,40 @@
   );
 
   const phase = getPhaseInfo(state.mode, state.scrambleState);
-  renderRunning(durationMs, phase);
+    renderRunning(durationMs, phase);
 
-  console.log('[goToNextPhase]', {
-    scrambleState: state.scrambleState,
-    lapIndex: state.lapIndex,
-    durationMs,
-  });
+    console.log('[goToNextPhase]', {
+      scrambleState: state.scrambleState,
+      lapIndex: state.lapIndex,
+      durationMs,
+    });
 
-  state.rafId = requestAnimationFrame(tick);
-}
+    state.rafId = requestAnimationFrame(tick);
+  }
+
+  function handleMetronome(remainingMs) {
+    if (remainingMs <= 0) return;
+    const intervalSec = getMetronomeInterval();
+    if (intervalSec <= 0) return;
+
+    const safeMs = Math.max(0, remainingMs);
+    const currentTenths = Math.floor(safeMs / 100);
+
+    if (state.lastMetronomeTenths === currentTenths) return;
+    state.lastMetronomeTenths = currentTenths;
+
+    // x.0 の瞬間だけ判定
+    if (currentTenths % 10 !== 0) return;
+
+    const wholeSeconds = currentTenths / 10;
+
+    if (wholeSeconds % intervalSec !== 0) {
+      playMetronomeBeep();
+      return;
+    }
+
+    playMetronomeChime();
+  }
 
   function tick() {
     clearTimerLoop();
@@ -1123,6 +1286,9 @@
 
     renderRunning(remainingMs, current);
 
+    // 追加：メトロノーム
+    handleMetronome(remainingMs);
+
     // 事前読み
     const leadMs = getLeadSeconds() * 1000;
     if (!state.leadFired && remainingMs <= leadMs && remainingMs > 0) {
@@ -1130,6 +1296,17 @@
         voice.lead(current);
       }
       state.leadFired = true;
+    }
+
+    // 5秒前読み上げ（10秒設定のときだけ）
+    if (
+      shouldPlayFiveSecondsVoice() &&
+      !state.fiveSecondsVoiceFired &&
+      remainingMs <= 5000 &&
+      remainingMs > 4000
+    ) {
+      voice.fiveSeconds();
+      state.fiveSecondsVoiceFired = true;
     }
 
     // 3秒前SE/カウント
@@ -1268,6 +1445,12 @@
     });
 
     document.querySelectorAll('input[name="playNextVoice"]').forEach((el) => {
+      el.addEventListener('change', () => {
+        saveSettings();
+      });
+    });
+
+    document.querySelectorAll('input[name="metronomeInterval"]').forEach((el) => {
       el.addEventListener('change', () => {
         saveSettings();
       });
