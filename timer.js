@@ -305,85 +305,85 @@ const LEVELS = {
 
       phases: [
         {
-          currentText: '-',
+          currentText: 'ランダム',
           noteText: '虹床',
 
           leadParts: ['g_niji'],
           nextParts: ['s_tsugi', 'g_niji', 's_loop'],
         },
         {
-          currentText: '外の外（安置）',
-          noteText: '網上・大外',
+          currentText: '①金網・線上（早めの床の安置）',
+          noteText: '早めの黄色い床→遅め',
 
           leadParts: ['g_amisen_osoto'],
           nextParts: ['s_tsugi', 'g_amisen_osoto'],
         },
         {
-          currentText: '-',
+          currentText: 'ランダム',
           noteText: '虹床',
 
           leadParts: ['g_niji'],
           nextParts: ['s_tsugi', 'g_niji'],
         },
         {
-          currentText: '外の外（安置）',
-          noteText: '中央大・外',
+          currentText: '②中央大・外（早めの床の安置）',
+          noteText: '早めの黄色い床→遅め',
 
           leadParts: ['g_center_large_soto'],
           nextParts: ['s_tsugi', 'g_center_large_soto'],
         },
         {
-          currentText: '-',
+          currentText: 'ランダム',
           noteText: '虹床',
 
           leadParts: ['g_niji'],
           nextParts: ['s_tsugi', 'g_niji'],
         },
         {
-          currentText: '大外（ずっと安置）',
-          noteText: '中央、網と線の上',
+          currentText: '③中央、網と線上（早めの床の安置）',
+          noteText: '早めの黄色い床→遅め',
 
           leadParts: ['g_center_amisen'],
           nextParts: ['s_tsugi', 'g_center_amisen'],
         },
         {
-          currentText: '-',
+          currentText: 'ランダム',
           noteText: '虹床',
 
           leadParts: ['g_niji'],
           nextParts: ['s_tsugi', 'g_niji'],
         },
         {
-          currentText: '線上（安置）',
-          noteText: '網上・大外',
+          currentText: '④網と線上・大外（早めの床の安置）',
+          noteText: '早めの黄色い床→遅め',
 
           leadParts: ['g_amisen_osoto'],
           nextParts: ['s_tsugi', 'g_amisen_osoto'],
         },
         {
-          currentText: '-',
+          currentText: 'ランダム',
           noteText: '虹床',
 
           leadParts: ['g_niji'],
           nextParts: ['s_tsugi', 'g_niji'],
         },
         {
-          currentText: '網上（安置）',
-          noteText: '網上・線上・外',
+          currentText: '⑤網と線上・外（早めの床の安置）',
+          noteText: '早めの黄色い床→遅め',
 
           leadParts: ['g_amisen_soto'],
           nextParts: ['s_tsugi', 'g_amisen_soto'],
         },
         {
-          currentText: '-',
+          currentText: 'ランダム',
           noteText: '虹床',
 
           leadParts: ['g_niji'],
           nextParts: ['s_tsugi', 'g_niji'],
         },
         {
-          currentText: '外（安置）',
-          noteText: '中央大・線上と外',
+          currentText: '⑥中央・線上と外（早めの床の安置）',
+          noteText: '早めの黄色い床→遅め',
 
           leadParts: ['g_center_senjo_soto'],
           nextParts: ['s_tsugi', 'g_center_senjo_soto'],
