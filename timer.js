@@ -1,5 +1,5 @@
-// Version: v2.4.1
-// Build: 2026-08-30
+// Version: v2.4.3
+// Build: 2026-11-19
 // Author: mentha0608
 // Voice: VOICEVOX:四国めたん
 //
@@ -67,6 +67,11 @@
         text: '5秒前',
         kana: 'ごびょうまえ',
         file: 's_5sec',
+    },
+    '2_kiiro': {
+        text: '黄色床です',
+        kana: 'きいろゆかです',
+        file: '2_kiiro',
     },
 
     // ===== サークル =====
@@ -176,8 +181,8 @@ const LEVELS = {
           noteText: 'サークル床',
 
           // Lv2サークルは床形状ランダムなので、
-          // 現時点では専用音声案内を行わない
-          leadParts: [],
+          // 現時点では[黄色の床です]の汎用音声案内のみ行う
+          leadParts: ['2_kiiro'],
           nextParts: [],
         },
       ],
@@ -216,10 +221,8 @@ const LEVELS = {
           currentText: '溝（安置）',
           noteText: '黄色床',
 
-          // 黄色床用の専用音声は後で追加する。
-          // 今は音声なしにしておく。
-          leadParts: [],
-          nextParts: [],
+          leadParts: ['2_kiiro'],
+          nextParts: ['s_tsugi', '2_kiiro'],
         },
       ],
     },
